@@ -1,0 +1,44 @@
+{
+  "variables": {
+     "source_ami": "",
+     "region": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "m3.medium",
+      "ssh_username": "ubuntu",
+      "ssh_timeout": "5m",
+      "ssh_pty": true,
+      "subnet_id": "{{user `subnet_id`}}",
+      "security_group_id": "{{user `security_group_id`}}",
+      "ami_name": "teamcity-{{timestamp}}",
+      "tags": {
+        "Name": "teamcity"
+      }
+    }
+  ],
+  "provisioners": [
+       {
+           "type": "shell",
+           "start_retry_timeout": "10m",
+           "inline": [
+               "DEBIAN_FRONTEND=noninteractive sudo apt-get update -y",
+               "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y openjdk-8-jre-headless wget",
+               "sudo groupadd teamcity",
+               "sudo useradd -g teamcity -d /opt teamcity",
+               "sudo wget https://download.jetbrains.com/teamcity/TeamCity-10.0.1.tar.gz",
+               "sudo tar -xvzf TeamCity-10.0.1.tar.gz -C /opt",
+               "sudo mkdir -p /opt/TeamCityData",
+               "sudo mkdir -p /opt/TeamCityData/lib/jdbc",
+               "sudo chown -R teamcity:teamcity /opt/TeamCityData",
+               "wget https://jdbc.postgresql.org/download/postgresql-9.4.1209.jre6.jar",
+               "sudo mv postgresql-9.4.1209.jre6.jar /opt/TeamCityData/lib/jdbc/",
+               "sudo mkdir /opt/TeamCityData/config",
+               "sudo chown -R teamcity:teamcity /opt/TeamCityData/config"
+           ]
+       }
+   ]
+}

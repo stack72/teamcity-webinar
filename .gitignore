@@ -1,0 +1,11 @@
+pkg/
+build/
+Gemfile.lock
+.gems/
+*.zip
+.vagrant/
+.terraform/
+packages/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
